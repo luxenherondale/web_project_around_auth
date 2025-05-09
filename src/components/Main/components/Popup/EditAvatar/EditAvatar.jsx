@@ -3,15 +3,13 @@ import React, { useContext, useRef } from "react";
 import CurrentUserContext from "../../../../../contexts/CurrentUserContext";
 
 export default function EditAvatar({ onSubmit, closeButton, popupTitle }) {
-  // Usamos useContext para obtener la función de actualización del avatar
   const { handleUpdateAvatar } = useContext(CurrentUserContext);
 
-  // Usamos useRef en lugar de useState para obtener acceso directo al valor del input
   const avatarUrlRef = useRef();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Usamos la referencia para obtener el valor actual del input
+
     handleUpdateAvatar({
       avatar: avatarUrlRef.current.value,
     });

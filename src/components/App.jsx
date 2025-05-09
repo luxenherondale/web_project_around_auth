@@ -280,7 +280,7 @@ function App() {
   }, [loggedIn, currentUser._id]);
 
   return (
-    // Pasamos las funciones y datos a través de los contextos
+    // las funciones y datos a través de los contextos
     <AuthContext.Provider
       value={{
         loggedIn,
