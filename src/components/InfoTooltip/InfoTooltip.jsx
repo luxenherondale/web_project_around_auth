@@ -4,11 +4,13 @@ import errorIcon from "../../images/error-icon.png";
 
 function InfoTooltip({ isOpen, onClose, isSuccess }) {
   return (
-    <div className={`popup ${isOpen ? "popup_opened" : ""}`}>
+    <div className={`overlay ${isOpen ? "active" : ""}`}>
       <div className="popup__container popup__container_type_tooltip">
-        <button className="popup__close-button" type="button" onClick={onClose}>
-          ✕
-        </button>
+        <button
+          className="popup__tooltip-close"
+          type="button"
+          onClick={onClose}
+        ></button>
         <div className="popup__tooltip-content">
           <img
             src={isSuccess ? successIcon : errorIcon}

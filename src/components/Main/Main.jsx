@@ -1,5 +1,4 @@
-// Importaciones actualizadas en Main.jsx
-
+// Main.jsx corregido
 import React, { useContext } from "react";
 
 import Popup from "./components/Popup/Popup";
@@ -26,13 +25,14 @@ export default function Main({
   setSelectedCard,
 }) {
   // Obtenemos el usuario actual del contexto
-  const { currentUser } = useContext(CurrentUserContext);
+  const { currentUser, handleUpdateUser, handleUpdateAvatar } =
+    useContext(CurrentUserContext);
 
   // Definimos los contenidos de los popups
   const editProfilePopup = {
     title: "Editar perfil",
     name: "edit-profile",
-    children: <EditProfile onSubmit={onUpdateUser} />,
+    children: <EditProfile onSubmit={handleUpdateUser} />,
   };
 
   const addCardPopup = {
@@ -44,7 +44,7 @@ export default function Main({
   const editAvatarPopup = {
     title: "Cambiar foto de perfil",
     name: "profile-edit",
-    children: <EditAvatar />,
+    children: <EditAvatar onSubmit={handleUpdateAvatar} />,
   };
 
   const deleteConfirmationPopup = {

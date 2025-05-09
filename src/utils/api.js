@@ -36,7 +36,7 @@ class Api {
 
   // Actualizar datos del usuario
   updateUserData(data) {
-    return this._request("/users/me", "PATCH", data);
+    return this._request("/users/me/profile", "PATCH", data);
   }
 
   // Actualizar avatar del usuario
@@ -46,22 +46,22 @@ class Api {
 
   // Obtener tarjetas iniciales
   getInitialCards() {
-    return this._request("/cards/");
+    return this._request("/cards");
   }
 
   // Crear nueva tarjeta
   createCard(data) {
-    return this._request("/cards/", "POST", data);
+    return this._request("/cards", "POST", data);
   }
 
   // Dar like a una tarjeta
   likeCard(cardId) {
-    return this._request(`/cards/${cardId}/likes`, "PUT");
+    return this._request(`/cards/likes/${cardId}`, "PUT");
   }
 
   // Quitar like de una tarjeta
   unlikeCard(cardId) {
-    return this._request(`/cards/${cardId}/likes`, "DELETE");
+    return this._request(`/cards/likes/${cardId}`, "DELETE");
   }
 
   // Eliminar tarjeta del servidor

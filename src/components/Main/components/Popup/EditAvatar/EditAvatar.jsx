@@ -18,7 +18,7 @@ export default function EditAvatar({ onSubmit, closeButton, popupTitle }) {
   };
 
   return (
-    <form className="avatar__form-edit form" onSubmit={handleSubmit}>
+    <form className="profile__form-edit form" onSubmit={handleSubmit}>
       {closeButton}
       {popupTitle}
       <fieldset className="form__fieldset fieldset">

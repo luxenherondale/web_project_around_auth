@@ -124,7 +124,9 @@ function App() {
   const handleUpdateUser = (data) => {
     api
       .updateUserData(data)
-      .then((newData) => {
+      .then((response) => {
+        // Verificar si la respuesta contiene data o si ya es el objeto actualizado
+        const newData = response.data || response;
         setCurrentUser({ ...currentUser, ...newData });
         handleClosePopup(); // Cierra el popup después de actualizar
       })
@@ -137,7 +139,9 @@ function App() {
   const handleUpdateAvatar = (data) => {
     api
       .updateUserAvatar(data)
-      .then((newData) => {
+      .then((response) => {
+        // Verificar si la respuesta contiene data o si ya es el objeto actualizado
+        const newData = response.data || response;
         setCurrentUser({ ...currentUser, ...newData });
         handleClosePopup(); // Cierra el popup después de actualizar
       })
@@ -150,12 +154,16 @@ function App() {
   const handleAddPlaceSubmit = (cardData) => {
     api
       .createCard(cardData)
-      .then((newCard) => {
+      .then((response) => {
+        // Verificamos si la respuesta contiene data o si la respuesta ya es la tarjeta
+        const newCard = response.data || response;
+
         // Añadir propiedad isLiked
         const newCardWithLikeStatus = {
           ...newCard,
           isLiked: false, // Una nueva tarjeta nunca tendrá like del usuario al crearla
         };
+
         setCards([newCardWithLikeStatus, ...cards]); // La nueva tarjeta aparece al principio
         handleClosePopup();
       })
@@ -171,7 +179,10 @@ function App() {
 
     try {
       // Envía una solicitud a la API y obtiene los datos actualizados de la tarjeta
-      const updatedCard = await api.changeLikeCardStatus(card._id, !isLiked);
+      const response = await api.changeLikeCardStatus(card._id, !isLiked);
+
+      // Verificamos si la respuesta contiene data o si ya es el objeto actualizado
+      const updatedCard = response.data || response;
 
       // Asegurando de que la propiedad isLiked esté actualizada
       const newCard = {
@@ -218,9 +229,11 @@ function App() {
       api
         .getUserData()
         .then((userData) => {
-          if (userData.data) {
-            console.log("User data loaded:", userData.data);
-            setCurrentUser({ ...userData.data, email: userEmail });
+          // Verificar si userData contiene .data o si ya es el objeto de usuario
+          const userInfo = userData.data || userData;
+          if (userInfo) {
+            console.log("User data loaded:", userInfo);
+            setCurrentUser({ ...userInfo, email: userEmail });
           }
         })
         .catch((err) => {
@@ -235,7 +248,15 @@ function App() {
       // Cargar tarjetas iniciales
       api
         .getInitialCards()
-        .then((cardsData) => {
+        .then((response) => {
+          // Verificar si la respuesta contiene .data o si ya es el array de tarjetas
+          const cardsData = response.data || response;
+
+          if (!Array.isArray(cardsData)) {
+            console.error("Los datos de tarjetas no son un array", cardsData);
+            return;
+          }
+
           // Procesar las tarjetas para añadir el estado de likes
           const processedCards = cardsData.map((card) => {
             // Verificar si el array de likes existe y es un array
