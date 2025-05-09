@@ -1,11 +1,18 @@
 import { useState, useEffect } from "react";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import "../App.css";
 import "../index.css";
 import Header from "./Header/Header";
 import Main from "./Main/Main";
 import Footer from "./Footer/Footer";
+import Login from "./Login/Login";
+import Register from "./Register/Register";
+import InfoTooltip from "./InfoTooltip/InfoTooltip";
+import ProtectedRoute from "./ProtectedRoute/ProtectedRoute";
 import api from "../utils/api";
+import * as auth from "../utils/auth";
 import CurrentUserContext from "../contexts/CurrentUserContext";
+import AuthContext from "../contexts/AuthContext";
 
 function App() {
   const [currentUser, setCurrentUser] = useState({
@@ -13,7 +20,16 @@ function App() {
     about: "",
     avatar: "",
     _id: "",
+    email: "",
   });
+
+  // Estado para auth
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
+  const [isSuccessful, setIsSuccessful] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+
+  const navigate = useNavigate();
 
   // Estado para las tarjetas (elevado desde Main)
   const [cards, setCards] = useState([]);
@@ -22,6 +38,26 @@ function App() {
   const [popup, setPopup] = useState(null);
   const [selectedCard, setSelectedCard] = useState(null);
   const [cardToDelete, setCardToDelete] = useState(null);
+
+  // Comprueba el token al cargar la aplicación
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      auth
+        .checkToken(token)
+        .then((res) => {
+          if (res) {
+            setLoggedIn(true);
+            setUserEmail(res.data.email);
+            navigate("/");
+          }
+        })
+        .catch((err) => {
+          console.error("Error al verificar token:", err);
+          localStorage.removeItem("token");
+        });
+    }
+  }, [navigate]);
 
   // Funciones para manejar popups
   function handleOpenPopup(popupContent) {
@@ -33,12 +69,63 @@ function App() {
     setSelectedCard(null);
   }
 
+  // Cerrar InfoTooltip
+  function closeInfoTooltip() {
+    setIsInfoTooltipOpen(false);
+    if (isSuccessful) {
+      navigate("/signin");
+    }
+  }
+
+  // Manejo de registro
+  const handleRegister = (data) => {
+    auth
+      .register(data)
+      .then(() => {
+        setIsSuccessful(true);
+        setIsInfoTooltipOpen(true);
+      })
+      .catch((err) => {
+        console.error("Error al registrar usuario:", err);
+        setIsSuccessful(false);
+        setIsInfoTooltipOpen(true);
+      });
+  };
+
+  // Manejo de login
+  const handleLogin = (data) => {
+    return auth
+      .login(data)
+      .then((res) => {
+        if (res.token) {
+          setLoggedIn(true);
+          setUserEmail(data.email);
+          navigate("/");
+          return res;
+        }
+      })
+      .catch((err) => {
+        console.error("Error al iniciar sesión:", err);
+        setIsSuccessful(false);
+        setIsInfoTooltipOpen(true);
+        throw err; // Para manejar el error en el componente Login
+      });
+  };
+
+  // Manejo de logout
+  const handleSignOut = () => {
+    localStorage.removeItem("token");
+    setLoggedIn(false);
+    setUserEmail("");
+    navigate("/signin");
+  };
+
   // Función para actualizar datos del usuario
   const handleUpdateUser = (data) => {
     api
       .updateUserData(data)
       .then((newData) => {
-        setCurrentUser(newData);
+        setCurrentUser({ ...currentUser, ...newData });
         handleClosePopup(); // Cierra el popup después de actualizar
       })
       .catch((err) => {
@@ -51,7 +138,7 @@ function App() {
     api
       .updateUserAvatar(data)
       .then((newData) => {
-        setCurrentUser(newData);
+        setCurrentUser({ ...currentUser, ...newData });
         handleClosePopup(); // Cierra el popup después de actualizar
       })
       .catch((err) => {
@@ -117,6 +204,7 @@ function App() {
         .catch((err) => console.error("Error al eliminar tarjeta:", err));
     }
   }
+
   // Funcion para establecer cardToDelete
   function handleDeleteClick(cardId) {
     setCardToDelete(cardId);
@@ -125,21 +213,23 @@ function App() {
 
   // Cargar información inicial del usuario y tarjetas
   useEffect(() => {
-    // Cargar información del usuario
-    api
-      .getUserData()
-      .then((userData) => {
-        console.log("User data loaded:", userData);
-        setCurrentUser(userData);
-      })
-      .catch((err) => {
-        console.error("Error al cargar datos del usuario:", err);
-      });
-  }, []);
+    if (loggedIn) {
+      // Cargar información del usuario
+      api
+        .getUserData()
+        .then((userData) => {
+          console.log("User data loaded:", userData);
+          setCurrentUser({ ...userData, email: userEmail });
+        })
+        .catch((err) => {
+          console.error("Error al cargar datos del usuario:", err);
+        });
+    }
+  }, [loggedIn, userEmail]);
 
   // Efecto separado para cargar tarjetas una vez que tengamos el usuario
   useEffect(() => {
-    if (currentUser._id) {
+    if (loggedIn && currentUser._id) {
       // Cargar tarjetas iniciales
       api
         .getInitialCards()
@@ -164,36 +254,91 @@ function App() {
         })
         .catch((err) => console.error("Error al cargar tarjetas:", err));
     }
-  }, [currentUser._id]);
+  }, [loggedIn, currentUser._id]);
 
   return (
-    // Pasamos las funciones y datos a través del contexto
-    <CurrentUserContext.Provider
+    // Pasamos las funciones y datos a través de los contextos
+    <AuthContext.Provider
       value={{
-        currentUser,
-        handleUpdateUser,
-        handleUpdateAvatar,
+        loggedIn,
+        userEmail,
+        handleLogin,
+        handleRegister,
+        handleSignOut,
       }}
     >
-      <div className="page">
-        <Header />
-        <Main
-          cards={cards}
-          onCardLike={handleCardLike}
-          onCardDelete={handleDeleteClick}
-          onConfirmDelete={handleCardDelete}
-          onAddPlace={handleAddPlaceSubmit}
-          onUpdateUser={handleUpdateUser}
-          onOpenPopup={handleOpenPopup}
-          onClosePopup={handleClosePopup}
-          popup={popup}
-          selectedCard={selectedCard}
-          setSelectedCard={setSelectedCard}
-          cardToDelete={cardToDelete}
-        />
-        <Footer />
-      </div>
-    </CurrentUserContext.Provider>
+      <CurrentUserContext.Provider
+        value={{
+          currentUser,
+          handleUpdateUser,
+          handleUpdateAvatar,
+        }}
+      >
+        <div className="page">
+          <Header
+            loggedIn={loggedIn}
+            email={userEmail}
+            onSignOut={handleSignOut}
+          />
+
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute
+                  element={Main}
+                  loggedIn={loggedIn}
+                  cards={cards}
+                  onCardLike={handleCardLike}
+                  onCardDelete={handleDeleteClick}
+                  onConfirmDelete={handleCardDelete}
+                  onAddPlace={handleAddPlaceSubmit}
+                  onUpdateUser={handleUpdateUser}
+                  onOpenPopup={handleOpenPopup}
+                  onClosePopup={handleClosePopup}
+                  popup={popup}
+                  selectedCard={selectedCard}
+                  setSelectedCard={setSelectedCard}
+                  cardToDelete={cardToDelete}
+                />
+              }
+            />
+
+            <Route
+              path="/signup"
+              element={
+                loggedIn ? (
+                  <Navigate to="/" replace />
+                ) : (
+                  <Register handleRegister={handleRegister} />
+                )
+              }
+            />
+
+            <Route
+              path="/signin"
+              element={
+                loggedIn ? (
+                  <Navigate to="/" replace />
+                ) : (
+                  <Login handleLogin={handleLogin} />
+                )
+              }
+            />
+
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+
+          {loggedIn && <Footer />}
+
+          <InfoTooltip
+            isOpen={isInfoTooltipOpen}
+            onClose={closeInfoTooltip}
+            isSuccess={isSuccessful}
+          />
+        </div>
+      </CurrentUserContext.Provider>
+    </AuthContext.Provider>
   );
 }
 

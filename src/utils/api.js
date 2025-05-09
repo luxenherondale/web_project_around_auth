@@ -1,4 +1,4 @@
-// api.js - Adaptado para usar con React
+// api.js - Adaptado para usar con React y autenticación
 
 class Api {
   constructor(options) {
@@ -6,11 +6,20 @@ class Api {
     this._headers = options.headers;
   }
 
+  // Método para obtener los headers con el token de autenticación
+  _getHeaders() {
+    const token = localStorage.getItem("token");
+    return {
+      ...this._headers,
+      Authorization: `Bearer ${token}`,
+    };
+  }
+
   // Método genérico para realizar solicitudes
   _request(endpoint, method = "GET", body) {
     return fetch(`${this._baseUrl}${endpoint}`, {
       method,
-      headers: this._headers,
+      headers: this._getHeaders(),
       body: body ? JSON.stringify(body) : undefined,
     }).then((res) => {
       if (res.ok) {
@@ -70,7 +79,6 @@ class Api {
 const api = new Api({
   baseUrl: "https://around-api.es.tripleten-services.com/v1",
   headers: {
-    authorization: "628cafd3-9a2c-42a3-9615-ad621da1e48b",
     "Content-Type": "application/json",
   },
 });
