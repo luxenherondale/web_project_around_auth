@@ -1,5 +1,4 @@
 import React from "react";
-// You'll need to import these icons
 import successIcon from "../../images/success-icon.png";
 import errorIcon from "../../images/error-icon.png";
 
@@ -12,7 +11,7 @@ function InfoTooltip({ isOpen, onClose, isSuccess }) {
         </button>
         <div className="popup__tooltip-content">
           <img
-            src={isSuccess ? "successIcon" : "errorIcon"}
+            src={isSuccess ? successIcon : errorIcon}
             alt={isSuccess ? "Éxito" : "Error"}
             className="popup__tooltip-icon"
           />

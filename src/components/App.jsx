@@ -46,7 +46,7 @@ function App() {
       auth
         .checkToken(token)
         .then((res) => {
-          if (res) {
+          if (res.data) {
             setLoggedIn(true);
             setUserEmail(res.data.email);
             navigate("/");
@@ -218,8 +218,10 @@ function App() {
       api
         .getUserData()
         .then((userData) => {
-          console.log("User data loaded:", userData);
-          setCurrentUser({ ...userData, email: userEmail });
+          if (userData.data) {
+            console.log("User data loaded:", userData.data);
+            setCurrentUser({ ...userData.data, email: userEmail });
+          }
         })
         .catch((err) => {
           console.error("Error al cargar datos del usuario:", err);

@@ -1,7 +1,7 @@
 // auth.js - Funciones para la autenticación de usuarios
 
 // URL base de la API
-const BASE_URL = "https://around-api.es.tripleten-services.com/v1";
+const BASE_URL = "https://se-register-api.en.tripleten-services.com/v1";
 
 // Función para verificar la respuesta de la API
 const checkResponse = (res) => {
