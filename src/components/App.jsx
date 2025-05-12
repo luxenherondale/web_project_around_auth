@@ -176,7 +176,7 @@ function App() {
 
   // Función para dar/quitar like a una tarjeta
   async function handleCardLike(card) {
-    // Verifica si a esta tarjeta ya le has dado like
+    // Verifica si a esta tarjeta ya le ha dado like
     const isLiked = card.isLiked;
 
     try {

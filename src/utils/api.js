@@ -10,7 +10,7 @@ class Api {
     const token = localStorage.getItem("token");
     return {
       ...this._headers,
-      Authorization: `Bearer ${token}`,
+      // Authorization: `Bearer ${token}`, //
     };
   }
 
@@ -78,6 +78,7 @@ const api = new Api({
   baseUrl: "https://around-api.es.tripleten-services.com/v1",
   headers: {
     "Content-Type": "application/json",
+    authorization: "628cafd3-9a2c-42a3-9615-ad621da1e48b",
   },
 });
 
