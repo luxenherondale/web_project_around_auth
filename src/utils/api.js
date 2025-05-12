@@ -55,12 +55,12 @@ class Api {
 
   // Dar like a una tarjeta
   likeCard(cardId) {
-    return this._request(`/cards/likes/${cardId}`, "PUT");
+    return this._request(`/cards/${cardId}/likes`, "PUT");
   }
 
   // Quitar like de una tarjeta
   unlikeCard(cardId) {
-    return this._request(`/cards/likes/${cardId}`, "DELETE");
+    return this._request(`/cards/${cardId}/likes`, "DELETE");
   }
 
   // Eliminar tarjeta del servidor

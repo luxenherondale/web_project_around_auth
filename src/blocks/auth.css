@@ -149,18 +149,25 @@
 }
 
 .popup__tooltip-close {
+  all: unset;
   width: 40px;
   height: 40px;
   position: absolute;
-  right: 400px;
-  top: 180px;
+  left: 1190px;
+  top: 270px;
   background-image: url("/src/images/CloseIcon.png");
   background-repeat: no-repeat;
   background-color: transparent;
 }
 
-/* Media Queries para dispositivos móviles */
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 1200px) {
+  .popup__tooltip-close {
+    left: 800px;
+    top: 175px;
+  }
+}
+
+@media screen and (max-width: 770px) {
   .auth {
     max-width: 320px;
     margin: 40px auto;
@@ -191,5 +198,18 @@
   .popup__tooltip-text {
     font-size: 20px;
     line-height: 24px;
+  }
+  .popup__tooltip-close {
+    left: 400px;
+    top: 175px;
+    position: absolute;
+  }
+}
+
+@media screen and (max-width: 770px) {
+  .popup__tooltip-close {
+    left: 200px;
+    top: 165px;
+    position: absolute;
   }
 }
