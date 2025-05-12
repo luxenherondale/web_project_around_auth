@@ -1,4 +1,4 @@
-// api.js - Adaptado para usar con React y autenticación
+// api.js - Para funcionalidad principal usando la API original
 
 class Api {
   constructor(options) {
@@ -6,7 +6,6 @@ class Api {
     this._headers = options.headers;
   }
 
-  // Método para obtener los headers con el token de autenticación
   _getHeaders() {
     const token = localStorage.getItem("token");
     return {
@@ -36,7 +35,7 @@ class Api {
 
   // Actualizar datos del usuario
   updateUserData(data) {
-    return this._request("/users/me/profile", "PATCH", data);
+    return this._request("/users/me", "PATCH", data);
   }
 
   // Actualizar avatar del usuario
@@ -75,9 +74,8 @@ class Api {
   }
 }
 
-// Instancia de la clase Api
 const api = new Api({
-  baseUrl: "https://se-register-api.en.tripleten-services.com/v1",
+  baseUrl: "https://around-api.es.tripleten-services.com/v1",
   headers: {
     "Content-Type": "application/json",
   },

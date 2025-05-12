@@ -46,9 +46,11 @@ function App() {
       auth
         .checkToken(token)
         .then((res) => {
-          if (res.data) {
+          // La API de registro puede devolver estructuras diferentes
+          if (res) {
             setLoggedIn(true);
-            setUserEmail(res.data.email);
+            // Manejar diferentes estructuras de respuesta
+            setUserEmail(res.data ? res.data.email : res.email);
             navigate("/");
           }
         })
@@ -225,15 +227,22 @@ function App() {
   // Cargar información inicial del usuario y tarjetas
   useEffect(() => {
     if (loggedIn) {
-      // Cargar información del usuario
+      // Cargar información del usuario usando la API principal
       api
         .getUserData()
         .then((userData) => {
-          // Verificar si userData contiene .data o si ya es el objeto de usuario
+          // Log para depuración
+          console.log("User data response:", userData);
+
+          // Verificar la estructura de la respuesta
           const userInfo = userData.data || userData;
+
           if (userInfo) {
             console.log("User data loaded:", userInfo);
-            setCurrentUser({ ...userInfo, email: userEmail });
+            setCurrentUser({
+              ...userInfo,
+              email: userEmail,
+            });
           }
         })
         .catch((err) => {
