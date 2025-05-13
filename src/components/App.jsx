@@ -221,7 +221,6 @@ function App() {
   // Funcion para establecer cardToDelete
   function handleDeleteClick(cardId) {
     setCardToDelete(cardId);
-    console.log("Card to delete set:", cardId); // Añadir para depuración
   }
 
   // Cargar información inicial del usuario y tarjetas
@@ -231,14 +230,10 @@ function App() {
       api
         .getUserData()
         .then((userData) => {
-          // Log para depuración
-          console.log("User data response:", userData);
-
           // Verificar la estructura de la respuesta
           const userInfo = userData.data || userData;
 
           if (userInfo) {
-            console.log("User data loaded:", userInfo);
             setCurrentUser({
               ...userInfo,
               email: userEmail,
